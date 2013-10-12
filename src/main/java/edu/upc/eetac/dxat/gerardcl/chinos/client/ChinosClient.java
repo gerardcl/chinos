@@ -85,7 +85,7 @@ public class ChinosClient {
 					}	
 					else if(response.startsWith("BET OF")){
 						String data[] = response.substring("BET OF ".length(), response.length()).split(" ");
-						System.out.println("El jugador "+data[0]+" apuesta que hay "+data[1]+" monedas...");
+						System.out.println("Tu contrincante "+data[0]+" apuesta que hay "+data[1]+" monedas...");
 					}	
 					else if(response.startsWith("AND")){
 						System.out.println(response+" !!!");
@@ -93,7 +93,7 @@ public class ChinosClient {
 						socket.close();
 					}else{
 						//not checking response to prevent error response handling, default is none wins and close...
-						System.out.println("NONE WINS!!!");
+						System.out.println(response);
 						socket.close();
 					}
 				} catch (IOException e) {

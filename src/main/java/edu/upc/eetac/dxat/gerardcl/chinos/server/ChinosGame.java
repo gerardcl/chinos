@@ -37,16 +37,17 @@ public class ChinosGame {
 			this.writer.println("WAIT BET");
 			this.writer.flush();
 		}
-		public void sendBetOf(String bet){
-			this.writer.println("BET OF "+player.getName()+" "+bet);
+		public void sendBetOf(String name, String bet){
+			this.writer.println("BET OF "+name+" "+bet);
 			this.writer.flush();
 		}
 		public void sendWinner(String winner){
 			this.writer.println("AND THE WINNER IS.... "+winner);
 			this.writer.flush();
 		}
-		public void sendNoneWins(/*String p1, int c1, int b1, String p2, int c1, int b2*/){
-			this.writer.println("NONE WINS!!!");
+		public void sendNoneWins(int empate/*String p1, int c1, int b1, String p2, int c1, int b2*/){
+			if(empate == 0)	this.writer.println("NONE WINS!!!");
+			else this.writer.println("DRAW!!! NONE WINS");
 			this.writer.flush();
 		}
 		public void run() {
@@ -61,21 +62,27 @@ public class ChinosGame {
 						player.setCoins(Integer.valueOf(rx_bet[0]));
 						player.setTotalCoins(Integer.valueOf(rx_bet[1]));
 						if(player.getPosition()==0){
-							playersThread[0].sendBetOf(rx_bet[1]);
 							playersThread[1].sendYourBet();
 							playersThread[0].sendWaitBet();
 						}else{
-							playersThread[1].sendBetOf(rx_bet[1]);
+							playersThread[0].sendBetOf(playersThread[1].getPlayer().getName(),Integer.toString(playersThread[1].getPlayer().getTotalCoins()));
+							playersThread[1].sendBetOf(playersThread[0].getPlayer().getName(),Integer.toString(playersThread[0].getPlayer().getTotalCoins()));
 							int actualCoins = playersThread[1].getPlayer().getCoins() + playersThread[0].getPlayer().getCoins();
-							if(actualCoins == playersThread[0].getPlayer().getTotalCoins()){
+							if(actualCoins == playersThread[0].getPlayer().getTotalCoins() && actualCoins == playersThread[1].getPlayer().getTotalCoins()){
+								playersThread[0].sendNoneWins(1);
+								playersThread[1].sendNoneWins(1);
+							}
+							else if(actualCoins == playersThread[0].getPlayer().getTotalCoins()){
 								playersThread[0].sendWinner(playersThread[0].getPlayer().getName());
 								playersThread[1].sendWinner(playersThread[0].getPlayer().getName());
-							}else if(actualCoins == playersThread[1].getPlayer().getTotalCoins()){
+							}
+							else if(actualCoins == playersThread[1].getPlayer().getTotalCoins()){
 								playersThread[0].sendWinner(playersThread[1].getPlayer().getName());
 								playersThread[1].sendWinner(playersThread[1].getPlayer().getName());
-							}else{
-								playersThread[0].sendNoneWins();
-								playersThread[1].sendNoneWins();
+							}
+							else{
+								playersThread[0].sendNoneWins(0);
+								playersThread[1].sendNoneWins(0);
 							}
 							playersThread[0].getPlayer().getSocket().close();
 							playersThread[1].getPlayer().getSocket().close();
