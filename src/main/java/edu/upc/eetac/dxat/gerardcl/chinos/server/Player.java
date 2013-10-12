@@ -6,8 +6,8 @@ public class Player {
 	private Socket socket;
 	private String name;
 	private int position;
-	private int coins;
-	private int totalCoins;
+	private int coins;		//las que tiene en la mano
+	private int totalCoins;	//las que predice
 	
 	public Player(Socket socket, String name, int position) {
 		super();
@@ -26,6 +26,7 @@ public class Player {
 		return totalCoins;
 	}
 	public void setTotalCoins(int totalCoins) {
+		//System.out.println("Apuesto que hay un total de "+ totalCoins +" monedas");
 		this.totalCoins = totalCoins;
 	}
 	public String getName() {
@@ -36,5 +37,9 @@ public class Player {
 	}
 	public int getCoins() {
 		return coins;
+	}
+	public void setCoins(int coins) {
+		//System.out.println("Me juego "+ coins +" monedas");
+		this.coins = coins;
 	}
 }

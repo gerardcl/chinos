@@ -20,6 +20,50 @@ public class ChinosClient {
 			this.writer = new PrintWriter(socket.getOutputStream()); 
 		}
 		
+		private int readCoins(){
+			System.out.println("Cuantas monedas juegas? (de 0 a 3 monedas...)");
+			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+			String input;
+			int ncoins = 0;
+			try {
+				input = reader.readLine();
+				ncoins = Integer.valueOf(input);
+				if(!(ncoins >= 0 && ncoins <= 3)){
+					System.out.println("Apuesta bien por favor...");
+					ncoins = readCoins();
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return ncoins;
+		}
+		
+		private int readBet(int coins){
+			System.out.println("Cuantas monedas crees que habra en total? (de "+coins+" a 6 monedas...)");
+			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+			String input;
+			int bet = 0;
+			try {
+				input = reader.readLine();
+				bet = Integer.valueOf(input);
+				if(!(bet >= coins && bet <= 6)){
+					System.out.println("Apuesta bien por favor...");
+					bet = readBet(coins);
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return bet;
+		}
+		
+		private void sendMyBet(){
+			int coins = readCoins();
+			writer.println("MY BET "+coins+" "+readBet(coins));
+			writer.flush();
+		}
+		
 		public void run() {
 			writer.println("PLAY "+name);
 			writer.flush();
@@ -28,16 +72,30 @@ public class ChinosClient {
 					String response = reader.readLine();
 					if(response.equals("WAIT"))
 						System.out.println("Esperando al otro jugador...");
-					if(response.equals("VERSUS")) 
-						//TODO PARSEAR EL NOMBRE....
-						System.out.println(response);
-					if(response.equals("YOUR BET"))
-						//TODO LEER POR CONSOLA LA APUESTA
-						//TODO sendMyBet(coins,totalCoins);
+					else if(response.startsWith("VERSUS")){
+						String name = response.substring("VERSUS ".length(), response.length());
+						System.out.println("Juegas contra "+name);
+					}
+					else if(response.equals("YOUR BET")){
 						System.out.println("Ya puedes apostar...");
-					//if(response.equals("WAIT BET"))
-						//TODO asdf
-						
+						sendMyBet();
+					}
+					else if(response.equals("WAIT BET")){
+						System.out.println("Esperando apuesta del contrincante...");
+					}	
+					else if(response.startsWith("BET OF")){
+						String data[] = response.substring("BET OF ".length(), response.length()).split(" ");
+						System.out.println("El jugador "+data[0]+" apuesta que hay "+data[1]+" monedas...");
+					}	
+					else if(response.startsWith("AND")){
+						System.out.println(response+" !!!");
+						System.out.println("Nos vemos!");
+						socket.close();
+					}else{
+						//not checking response to prevent error response handling, default is none wins and close...
+						System.out.println("NONE WINS!!!");
+						socket.close();
+					}
 				} catch (IOException e) {
 					if(!socket.isClosed())
 						e.printStackTrace();
